@@ -20,7 +20,7 @@ variable "node_pool" {
   })
 }
 
-### strimzi-kafka
+### kafka-strimzi
 variable "strimzi_version" {
   type = string
 }
@@ -51,4 +51,10 @@ variable "topic" {
     partitions = number
     replicas   = number
   })
+}
+
+### container-registry
+variable "secret_name" {
+  type    = string
+  default = ""
 }

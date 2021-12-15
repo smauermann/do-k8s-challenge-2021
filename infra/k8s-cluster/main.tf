@@ -1,4 +1,3 @@
-
 resource "digitalocean_project" "this" {
   name        = var.project
   description = "Digitalocean Kubernetes Challenge 2021"

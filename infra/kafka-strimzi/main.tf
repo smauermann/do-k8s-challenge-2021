@@ -81,12 +81,6 @@ resource "kubernetes_manifest" "cluster" {
             authentication = {
               type = "tls"
             }
-          },
-          {
-            name = "external"
-            port = 9094
-            type = "nodeport"
-            tls  = false
           }
         ]
         storage = {

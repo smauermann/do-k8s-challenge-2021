@@ -1,5 +1,6 @@
 ### Custom ###
 .envrc
+**/strimzi-*
 
 ### Terraform ###
 # Local .terraform directories

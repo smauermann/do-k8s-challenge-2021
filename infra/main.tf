@@ -15,3 +15,11 @@ module "kafka" {
   cluster         = var.cluster
   topic           = var.topic
 }
+
+module "registry" {
+  source = "./container-registry"
+
+  project     = var.project
+  namespaces  = [var.namespace, "default"]
+  secret_name = var.secret_name
+}
