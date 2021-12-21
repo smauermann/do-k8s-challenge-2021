@@ -8,16 +8,21 @@ import (
 )
 
 func main() {
+	Receive()
+}
+
+func Receive() {
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": os.Getenv("BOOTSTRAP_SERVERS"),
 		"group.id":          os.Getenv("GROUP_ID"),
 		"auto.offset.reset": "earliest",
 	})
-
 	if err != nil {
 		panic(err)
 	}
+
+	defer c.Close()
 
 	c.SubscribeTopics([]string{os.Getenv("TOPIC")}, nil)
 
@@ -30,6 +35,4 @@ func main() {
 			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
 		}
 	}
-
-	c.Close()
 }
