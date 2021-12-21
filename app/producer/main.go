@@ -8,8 +8,12 @@ import (
 )
 
 func main() {
+	message := []string{"DigitalOcean", "Kubernetes", "Challenge", "2021"}
+	Send(message)
+}
 
-	fmt.Printf("BOOTSTRAP_SERVERS => %v, TOPIC => %v", os.Getenv("BOOTSTRAP_SERVERS"), os.Getenv("TOPIC"))
+func Send(message []string) {
+
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": os.Getenv("BOOTSTRAP_SERVERS")})
 	if err != nil {
 		panic(err)
@@ -33,7 +37,7 @@ func main() {
 
 	// Produce messages to topic (asynchronously)
 	topic := os.Getenv("TOPIC")
-	for _, word := range []string{"Welcome", "to", "the", "Confluent", "Kafka", "Golang", "client"} {
+	for _, word := range message {
 		p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Value:          []byte(word),
