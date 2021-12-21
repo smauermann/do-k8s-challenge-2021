@@ -1,0 +1,64 @@
+name: App
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changed:
+    runs-on: ubuntu-latest
+    outputs:
+      producer: ${{ steps.changed.outputs.producer }}
+      consumer: ${{ steps.changed.outputs.consumer }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Git diff
+        id: changed
+        run: |
+          echo "::set-output name=producer::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- app/producer | tr -d '\n')"
+          echo "::set-output name=consumer::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- app/consumer | tr -d '\n')"
+
+  producer:
+    runs-on: ubuntu-latest
+    needs: changed
+    if: ${{ needs.changed.outputs.producer }}
+    defaults:
+      run:
+        working-directory: ./app/producer
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.17.1"
+      - run: go build .
+        env:
+          GOPROXY: "https://proxy.golang.org"
+      - run: go vet .
+
+  consumer:
+    runs-on: ubuntu-latest
+    needs: changed
+    if: ${{ needs.changed.outputs.consumer }}
+    defaults:
+      run:
+        working-directory: ./app/consumer
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.17.1"
+      - run: go build .
+        env:
+          GOPROXY: "https://proxy.golang.org"
+      - run: go vet .
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: changed
+    if: ${{ needs.changed.outputs.producer }} || ${{ needs.changed.outputs.consumer }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker-compose -f app/docker-compose.yaml up --exit-code-from producer
