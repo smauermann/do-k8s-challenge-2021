@@ -6,8 +6,22 @@ on:
       - main
 
 jobs:
-  check:
+  changed:
     runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.changed.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Git diff
+        id: changed
+        run: |
+          echo "::set-output name=infra::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- infra | tr -d '\n')"
+  lint:
+    runs-on: ubuntu-latest
+    needs: changed
+    if: ${{ needs.changed.outputs.infra }}
     defaults:
       run:
         working-directory: infra
