@@ -146,3 +146,16 @@ resource "kubernetes_manifest" "topic" {
   }
   depends_on = [null_resource.operator]
 }
+
+resource "kubernetes_config_map" "this" {
+  metadata {
+    name      = "kafka-client-config"
+    namespace = kubernetes_namespace.cluster.metadata[0].name
+  }
+
+  data = {
+    bootstrap_servers = "${var.cluster.kafka.name}-kafka-bootstrap:9092"
+    topic             = var.topic.name
+    group_id          = "kafka-consumers"
+  }
+}
