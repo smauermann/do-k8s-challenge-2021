@@ -1,0 +1,33 @@
+{
+  "name": "do-k8s-challenge-2021",
+  "version": "1.0.0",
+  "description": "My contribution for the DigitalOcean k8s challenge 2021",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:neurotronix/do-k8s-challenge-2021.git"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "npmPublish": false
+  },
+  "keywords": [
+    "kubernetes",
+    "k8s",
+    "digitalocean"
+  ],
+  "author": "Stephan Mauermann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/neurotronix/do-k8s-challenge-2021/issues"
+  },
+  "homepage": "https://github.com/neurotronix/do-k8s-challenge-2021#readme",
+  "devDependencies": {
+    "semantic-release": "^18.0.1"
+  }
+}
