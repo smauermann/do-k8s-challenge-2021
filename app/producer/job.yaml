@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-producer
+  namespace: kafka
+spec:
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      containers:
+        - name: kafka-producer
+          image: registry.digitalocean.com/do-k8s-challenge-2021-registry/kafka-producer:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-client-config
+                  key: bootstrap_servers
+            - name: TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-client-config
+                  key: topic
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: do-k8s-challenge-2021-registry

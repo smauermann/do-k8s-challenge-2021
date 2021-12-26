@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      containers:
+        - name: kafka-consumer
+          image: registry.digitalocean.com/do-k8s-challenge-2021-registry/kafka-consumer:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-client-config
+                  key: bootstrap_servers
+            - name: TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-client-config
+                  key: topic
+            - name: GROUP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-client-config
+                  key: group_id
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      imagePullSecrets:
+        - name: do-k8s-challenge-2021-registry
