@@ -1,9 +1,8 @@
 name: Deploy Producer
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  release:
+    types: [released]
 
 jobs:
   build-push:
