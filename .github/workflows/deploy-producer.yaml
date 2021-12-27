@@ -2,7 +2,7 @@ name: Deploy Producer
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   build-push:
