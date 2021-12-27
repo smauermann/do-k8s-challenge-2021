@@ -40,5 +40,5 @@ jobs:
         run: echo "RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Update k8s manifest
         run: |
-          sed -i '/image:/s/:latest/:${{ env.RELEASE_TAG }}/' app/producer/deploy.yaml
+          sed -i '/image:/s/:latest/:${{ env.RELEASE_TAG }}/' app/producer/job.yaml
       - run: kubectl apply -f app/producer/job.yaml
