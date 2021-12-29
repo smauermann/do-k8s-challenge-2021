@@ -7,6 +7,7 @@ module "k8s" {
   node_pool = var.node_pool
 }
 
+
 module "kafka" {
   source = "./kafka-strimzi"
 
@@ -14,6 +15,8 @@ module "kafka" {
   namespace       = var.namespace
   cluster         = var.cluster
   topic           = var.topic
+
+  depends_on = [module.k8s]
 }
 
 module "registry" {

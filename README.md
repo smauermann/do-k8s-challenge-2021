@@ -21,7 +21,7 @@ Again, we use GitHub Actions as CI system. Basic validation (e.g. `go build`) is
 ## Bootstrap
 0. Clone the repo.
 1. Setup a Terraform (TF) Cloud account. TF Cloud is free for individuals and highly recommended to set up. It offers remote state storage and a TF execution environment. You can chose to use the remote state storage alone without running TF commands in the cloud.
-2. [Optional] Install [`doctl`](https://docs.digitalocean.com/reference/doctl/how-to/install/), the DigitalOcean CLI tool. With this we can easily obtain the kubeconfig for our Kubernetes cluster.
+2. Install [`doctl`](https://docs.digitalocean.com/reference/doctl/how-to/install/), the DigitalOcean CLI tool. With this we can easily obtain the kubeconfig for our Kubernetes cluster.
 
 ### Infrastructure
 1. Modify the Terraform (TF) Cloud organisation in `infra/providers.tf`. Your org will likely have a different name than mine.
@@ -68,11 +68,21 @@ topic = {
 </details>  
 
 3. Depending on your TF Cloud configuration, `terraform plan` and `terraform apply` runs can either be triggered from GitHub webhooks or locally.
-4. Apply the TF specs to create Kubernetes Cluster, Kafka Cluster and Container Registry.
-5. Setup kubeconfig with `doctl`:
+4. Apply the TF specs to create Kubernetes Cluster, Kafka Cluster and Container Registry. Unfortunately, we need to target resources when creating our infra. This is due to `kubernetes_manifest` requiring a valid kubeconfig, which of course cannot exist before the Kubernetes cluster has been created. So apply as follows:
 ```shell
-doctl kubernetes cluster kubeconfig save <cluster-id>
+cd infra && \
+terraform apply -target=module.k8s && \
+terraform apply -target=module.kafka.module.operator && \
+terraform apply
 ```
+5. Destroying the infrastructure works in one go:
+```shell
+cd infra && terraform destroy
+```
+  - If there is no default VPC in the region, the created VPC will become the default VPC
+  - In which case the `destroy` operation will fail as default VPCs cannot be deleted, create a new VPC and make it the default VPC to be able to manage the VPC via Terraform
+  - For some reason the VPC deletion will fail right after the Kubernetes Cluster deletion with the error `Can not delete VPC with members`
+  - A targeted destroy a few seconds will delete the VPC however: `terraform destroy -target=module.k8s.digitalocean_vpc.this`
 
 ### Sample App
 1. The app deployment is fully automated and triggered by successful release workflows. Shout out to Othmane's [post](https://dev.to/othpwn/how-to-deploy-an-api-to-a-kubernetes-cluster-with-a-github-actions-ci-cd-workflow-km).
@@ -95,3 +105,5 @@ Message on kafka-topic[2]@4074: Kubernetes
 - Apps are deployed on every release, even if only infrastructure parts have changed
 - The release workflow does neither update the version in `package.json` nor creates/updates a `CHANGELOG.md` file
 - Change detection does not work for integration job (it always runs)
+- The `kubernetes_manifest` resources of the TF Kubernetes provider require an existing kubeconfig, this makes it impossible to create the Kubernetes cluster and CRDs in one go
+  - In other words, Kubernetes cluster and Kubernetes Manifest resources cannot be created in the same Terraform run
