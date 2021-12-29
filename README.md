@@ -1,3 +1,5 @@
+[![Terraform](https://github.com/neurotronix/do-k8s-challenge-2021/actions/workflows/terraform.yaml/badge.svg)](https://github.com/neurotronix/do-k8s-challenge-2021/actions/workflows/terraform.yaml)
+[![App](https://github.com/neurotronix/do-k8s-challenge-2021/actions/workflows/app.yaml/badge.svg)](https://github.com/neurotronix/do-k8s-challenge-2021/actions/workflows/app.yaml)
 # DigitalOcean Kubernetes Challenge 2021
 ## The Task
 > **Deploy a scalable message queue**
