@@ -19,9 +19,10 @@ Again, we use GitHub Actions as CI system. Basic validation (e.g. `go build`) is
 ## Bootstrap
 0. Clone the repo.
 1. Setup a Terraform (TF) Cloud account. TF Cloud is free for individuals and highly recommended to set up. It offers remote state storage and a TF execution environment. You can chose to use the remote state storage alone without running TF commands in the cloud.
+2. [Optional] Install [`doctl`](https://docs.digitalocean.com/reference/doctl/how-to/install/), the DigitalOcean CLI tool. With this we can easily obtain the kubeconfig for our Kubernetes cluster.
 
 ### Infrastructure
-1. Modify the Terraform (TF) Cloud organisation in `infra/providers.tf`.
+1. Modify the Terraform (TF) Cloud organisation in `infra/providers.tf`. Your org will likely have a different name than mine.
 2. Define deployment parameters either via an `terraform.auto.tfvars` file or on the TF Cloud web UI. 
 <details>
 <summary>Here is an example.</summary>
@@ -66,6 +67,10 @@ topic = {
 
 3. Depending on your TF Cloud configuration, `terraform plan` and `terraform apply` runs can either be triggered from GitHub webhooks or locally.
 4. Apply the TF specs to create Kubernetes Cluster, Kafka Cluster and Container Registry.
+5. Setup kubeconfig with `doctl`:
+```shell
+doctl kubernetes cluster kubeconfig save <cluster-id>
+```
 
 ### Sample App
 1. The app deployment is fully automated and triggered by successful release workflows. Shout out to Othmane's [post](https://dev.to/othpwn/how-to-deploy-an-api-to-a-kubernetes-cluster-with-a-github-actions-ci-cd-workflow-km).
