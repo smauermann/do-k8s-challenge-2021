@@ -12,6 +12,10 @@ resource "digitalocean_vpc" "this" {
   region = var.region
 
   ip_range = var.vpc_range
+
+  timeouts {
+    delete = "30m"
+  }
 }
 
 data "digitalocean_kubernetes_versions" "this" {}
@@ -38,4 +42,25 @@ resource "digitalocean_kubernetes_cluster" "this" {
     auto_scale = var.node_pool.auto_scale
     node_count = var.node_pool.node_count
   }
+  depends_on = [digitalocean_vpc.this]
+}
+
+resource "null_resource" "kubeconfig" {
+  triggers = {
+    cluster_id = digitalocean_kubernetes_cluster.this.id
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = <<-EOT
+    doctl kubernetes cluster kubeconfig save ${self.triggers.cluster_id}
+    EOT
+  }
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+    doctl kubernetes cluster kubeconfig remove ${self.triggers.cluster_id}
+    EOT
+  }
+  depends_on = [digitalocean_kubernetes_cluster.this]
 }
